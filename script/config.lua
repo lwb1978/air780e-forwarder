@@ -54,13 +54,17 @@ return {
     --
     -- smtp 通知配置(可能不支持加密协议)
     SMTP_HOST = "smtp.qq.com",
-    SMTP_PORT = 25,
+    SMTP_PORT = 465,
     SMTP_USERNAME = "",
     SMTP_PASSWORD = "",
     SMTP_MAIL_FROM = "",
     SMTP_MAIL_TO = "",
     SMTP_MAIL_SUBJECT = "来自 Air780E 的通知",
-    SMTP_TLS_ENABLE = false,
+    --▼▼▼ 新增的两个配置项 ▼▼▼--
+    SMTP_MAIL_SUBJECT_BOOT = "来自 Air780E 的通知 - 上线通知",
+    SMTP_MAIL_SUBJECT_SMS = "来自 Air780E 的通知 - 短信转发",
+    --▲▲▲ 新增的两个配置项 ▲▲▲--
+    SMTP_TLS_ENABLE = true,
     --
     -- gotify 通知配置, https://gotify.net/
     GOTIFY_API = "",

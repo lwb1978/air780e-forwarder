@@ -46,6 +46,12 @@ end
 -- @param channels 通知渠道
 -- @param id 消息唯一标识
 function util_notify.add(msg, channels, id)
+    -- 新增：过滤上线通知
+    if type(msg) == "string" and msg:find("#BOOT_") then
+        log.info("util_notify.add", "忽略上线通知")
+        return
+    end
+
     msg_count = msg_count + 1
 
     if id == nil or id == "" then
@@ -124,9 +130,7 @@ local function poll()
     -- 每连续失败 2 次, 开关飞行模式
     if error_count % 2 == 0 then
         -- 开关飞行模式
-        log.warn("util_notify.poll", "连续失败次数过多, 重启协议栈 & 开关飞行模式")
-        mobile.reset()
-        sys.wait(1000)
+        log.warn("util_notify.poll", "连续失败次数过多, 开关飞行模式")
         mobile.flymode(0, true)
         mobile.flymode(0, false)
         sys.wait(1000)

@@ -12,6 +12,12 @@ sysplus = require "sysplus"
 wdt.init(9000)
 sys.timerLoopStart(wdt.feed, 3000)
 
+-- 在这里加上回收内存的代码
+sys.timerLoopStart(function()
+       log.info("回收一次内存")
+       collectgarbage("collect")
+end,3600000) -- 每小时回收一次内存
+
 -- 设置电平输出 3.3V
 -- pm.ioVol(pm.IOVOL_ALL_GPIO, 3300)
 
@@ -20,7 +26,7 @@ socket.setDNS(nil, 1, "119.29.29.29")
 socket.setDNS(nil, 2, "223.5.5.5")
 
 -- SIM 自动恢复, 周期性获取小区信息, 网络遇到严重故障时尝试自动恢复等功能
-mobile.setAuto(10000, 30000, 8, true, 60000)
+mobile.setAuto(10000, 300000, 8, true, 120000)
 
 -- 开启 IPv6
 -- mobile.ipv6(true)
@@ -169,6 +175,12 @@ sys.taskInit(function()
     if type(config.REPORT_INTERVAL) == "number" and config.REPORT_INTERVAL >= 1000 * 60 then
         sys.timerLoopStart(function() util_notify.add("#ALIVE_REPORT") end, config.REPORT_INTERVAL)
     end
+
+    -- 新增：每隔2小时重启设备
+    sys.timerLoopStart(function()
+        log.info("main", "设备即将重启")
+        rtos.restart()  -- 重启设备
+    end, 2 * 60 * 60 * 1000)  -- 2小时 = 7200000毫秒
 
     -- 电源键短按发送测试通知
     sys.subscribe("POWERKEY_SHORT_PRESS", function() util_notify.add("#ALIVE") end)

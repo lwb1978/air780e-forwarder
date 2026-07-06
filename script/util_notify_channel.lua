@@ -275,7 +275,17 @@ return {
         log.info("util_notify", "POST", config.NEXT_SMTP_PROXY_API)
         return util_http.fetch(nil, "POST", config.NEXT_SMTP_PROXY_API, header, urlencodeTab(body))
     end,
+
     ["smtp"] = function(msg)
+        local subject = config.SMTP_MAIL_SUBJECT  -- 默认主题
+        
+        -- 判断消息类型
+        if msg:find("#BOOT_") then
+            subject = config.SMTP_MAIL_SUBJECT_BOOT
+        elseif msg:find("#SMS") then
+            subject = config.SMTP_MAIL_SUBJECT_SMS
+        end
+
         local smtp_config = {
             host = config.SMTP_HOST,
             port = config.SMTP_PORT,
@@ -285,7 +295,7 @@ return {
             mail_to = config.SMTP_MAIL_TO,
             tls_enable = config.SMTP_TLS_ENABLE,
         }
-        local result = lib_smtp.send(msg, config.SMTP_MAIL_SUBJECT, smtp_config)
+        local result = lib_smtp.send(msg, subject, smtp_config)  -- 使用动态主题
         log.info("util_notify", "SMTP", result.success, result.message, result.is_retry)
         if result.success then
             return 200, nil, result.message
@@ -295,6 +305,7 @@ return {
         end
         return 400, nil, result.message
     end,
+
     -- 发送到 serial
     ["serial"] = function(msg)
         uart.write(1, msg)
